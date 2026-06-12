@@ -1,5 +1,5 @@
 // -------------------------------------------------
-//  Nested Todo App — Vanilla JS (Fixed Drag & Drop)
+//  Todo App 
 // -------------------------------------------------
 
 const STORAGE_KEY = 'three-matters-todos-v1';
@@ -7,7 +7,7 @@ const STORAGE_KEY = 'three-matters-todos-v1';
 let todos         = [];
 let currentFilter = 'all';
 
-// ── Persistence ──────────────────────────────────
+// Persistence 
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
 }
@@ -16,13 +16,13 @@ function load() {
   catch { todos = []; }
 }
 
-// ── Helpers ──────────────────────────────────────
+// Helpers 
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 function findTodo(id) { return todos.find(t => t.id === id); }
 
-// ── CRUD ─────────────────────────────────────────
+// CRUD 
 function addTodo(text) {
   text = text.trim();
   if (!text) return;
@@ -74,7 +74,7 @@ function clearCompleted() {
   save(); render();
 }
 
-// ── Filter ───────────────────────────────────────
+// Filter 
 function setFilter(filter) {
   currentFilter = filter;
   window.location.hash = filter;
@@ -89,7 +89,7 @@ function matchesFilter(todo) {
   return true;
 }
 
-// ── Inline subtask input ──────────────────────────
+// Inline subtask input 
 function attachSubtaskInput(parentLi, parentId) {
   document.querySelectorAll('.subtask-input-row').forEach(r => r.remove());
 
@@ -127,7 +127,7 @@ function attachSubtaskInput(parentLi, parentId) {
   inp.focus();
 }
 
-// ── Footer ───────────────────────────────────────
+// Footer 
 function updateFooter() {
   let footer = document.getElementById('todo-footer');
   if (!footer) {
@@ -148,7 +148,7 @@ function updateFooter() {
   footer.querySelector('#clear-btn')?.addEventListener('click', clearCompleted);
 }
 
-// ── Render & Component D&D Logic ─────────────────
+// Render & Drag-drop
 function render() {
   const listEl = document.getElementById('todo-list');
   listEl.innerHTML = '';
@@ -166,7 +166,7 @@ function render() {
   }
 
   visible.forEach(todo => {
-    // ---- Main Task Elements ----
+    //Main Task Elements 
     const li = document.createElement('li');
     li.className = 'todo' + (todo.completed ? ' completed' : '');
     li.id = 'todo-' + todo.id;
@@ -195,7 +195,7 @@ function render() {
 
     li.append(cb, textSpan, subBtn, delBtn);
 
-    // ---- Main Task D&D Events ----
+    //Main Task Dragdrop
     li.addEventListener('dragstart', e => {
       e.stopPropagation(); // Prevent container from catching it
       e.dataTransfer.effectAllowed = 'move';
@@ -223,7 +223,7 @@ function render() {
       const dataStr = e.dataTransfer.getData('text/plain');
       if (!dataStr) return;
       
-      // NEW MATH LOGIC: Calculate mouse position relative to the task being dropped on
+      //mouse position relative to the task being dropped on
       const rect = li.getBoundingClientRect();
       const relY = e.clientY - rect.top;
       const dropOnTopHalf = relY < (rect.height / 2);
@@ -253,7 +253,7 @@ function render() {
           if (si === -1) return;
 
           if (dropOnTopHalf) {
-            // PROMOTION: Dropped on the top half -> Make it a top-level task BEFORE this task
+            // Dropped on the top half -> top-level task BEFORE this task
             const [movedSub] = srcParent.subtasks.splice(si, 1);
             const targetIndex = todos.findIndex(t => t.id === todo.id);
             todos.splice(targetIndex, 0, { 
@@ -264,7 +264,7 @@ function render() {
             });
             save(); render();
           } else {
-            // ADOPTION: Dropped on the bottom half -> Make it a subtask of THIS main task
+            // Dropped on the bottom half -> subtask of THIS main task
             if (data.parentId === todo.id) return; // Prevent dropping on its own parent
             const [movedSub] = srcParent.subtasks.splice(si, 1);
             todo.subtasks.push(movedSub);
@@ -281,7 +281,7 @@ function render() {
 
     listEl.appendChild(li);
 
-    // ---- Subtask Elements ----
+    // Subtask Elements 
     todo.subtasks.forEach(sub => {
       const sli = document.createElement('li');
       sli.className = 'todo subtask' + (sub.completed ? ' completed' : '');
@@ -305,7 +305,7 @@ function render() {
 
       sli.append(sCb, sSpan, sDel);
 
-      // ---- Subtask D&D Events ----
+      // Subtask Drag-drop
       sli.addEventListener('dragstart', e => {
         e.stopPropagation();
         e.dataTransfer.effectAllowed = 'move';
@@ -317,7 +317,6 @@ function render() {
       sli.addEventListener('dragover', e => {
         e.preventDefault();
         e.stopPropagation();
-        // Highlight the parent main task to show it will be dropped in the same group
         li.classList.add('drag-over'); 
       });
 
@@ -331,7 +330,7 @@ function render() {
 
         try {
           const data = JSON.parse(dataStr);
-          // If a subtask is dropped onto another subtask, move it to that subtask's parent
+          // If a subtask is dropped onto another subtask, moving it to that subtask's parent
           if (data.type === 'subtask' && data.parentId !== todo.id) {
             const srcParent = findTodo(data.parentId);
             if (!srcParent) return;
@@ -358,7 +357,7 @@ function render() {
   updateFooter();
 }
 
-// ── Boot & Global Drag Listners ──────────────────
+// Drag Listners 
 document.addEventListener('DOMContentLoaded', () => {
   const inputEl = document.getElementById('new-todo');
   const listEl = document.getElementById('todo-list');
@@ -390,10 +389,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ---- Promoting Subtask to Main Task ----
+  //  Promoting Subtask to Main Task
   // When dropping anywhere in the list that ISN'T intercepted by a specific <li>
   listEl.addEventListener('dragover', e => {
-    e.preventDefault(); // crucial to allow drop on the empty space
+    e.preventDefault();
   });
 
   listEl.addEventListener('drop', e => {
