@@ -51,6 +51,12 @@ h1 {
     padding: 0.5rem 0;
     border-bottom: 1px solid #eee;
 }
+/* Strikethrough for completed tasks */
+.todo.completed .text {
+  text-decoration: line-through;
+  color: #888; /* Optional: grays out the text to make it look 'done' */
+  transition: all 0.2s ease; /* Optional: adds a smooth fade effect */
+}
 .todo.dragging {
     opacity: 0.5;
 }
